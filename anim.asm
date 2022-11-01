@@ -1,7 +1,7 @@
 global _start
 section .data
 	hash: db "#"
-	space: db "          "
+	space: db " "
 	
 	clear: db 27,"[H",27,"[2J"
 	clen: equ $ - clear
@@ -29,18 +29,29 @@ reset_counter:
 	mov r8, 1
 	ret
 
+; function to print r8 number of spaces
+print_spaces:
+	mov r9, 0
+loop:	
+	call print_sr
+	mov rsi, space
+	mov rdx, 1
+	syscall	
+
+	inc r9
+	cmp r9, r8
+	jne loop
+	ret
+
 ; - - - - - - - - - - - - - - - - - 
 
 _start:
+	call clear_screen
 	call reset_counter
 
 mainloop:
-	
-	call print_sr
-	mov rsi, space
-	mov rdx, r8	; set counter value to length
-	syscall
-	
+
+	call print_spaces	
 	
 	call print_sr
 	mov rsi, hash
@@ -53,20 +64,16 @@ mainloop:
 	xor rsi, rsi
 	syscall
 
-
 	call clear_screen
 
 	inc r8
-	cmp r8, 5
+	cmp r8, 10
 	jne mainloop
 
 	call reset_counter
-	
 	jmp mainloop
 
 	; exit
 	mov rax, 60
 	mov rdi, 0
-	syscall
-	
-		
+	syscall	
